@@ -1,18 +1,32 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
 import { YOUTUBE_SEARCH_API } from "../utils/constants";
 import { closeMenu } from "../utils/appSlice";
+// import { json } from "react-router-dom";
+import { cacheResult } from "../utils/searchSlice";
 const Head = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [suggestions, setSuggestions] = React.useState([]);
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
+  const searchCache = useSelector((store) => store.search);
+  const cache = searchCache[searchQuery];
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
     //make an api call after every key press
     //but if the difference between two 2 api calls is less than 200ms
     //then decline the api call
-    const timer = setTimeout(() => getSearchSuggestions(), 200); //implement debounce
+    const timer = setTimeout(() => {
+      //searching in cache
+      if (cache) {
+        setSuggestions(cache);
+      } else {
+        getSearchSuggestions();
+      }
+    }, 200); //implement debounce
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
@@ -23,9 +37,10 @@ const Head = () => {
     const json = await response.json();
     // console.log(json);
     setSuggestions(json[1]);
-  }
 
-  const dispatch = useDispatch();
+    //caching the result by dispatching an action
+    dispatch(cacheResult({ [searchQuery]: json[1] }));
+  }
 
   useEffect(() => {
     // this action will keep it close by default
