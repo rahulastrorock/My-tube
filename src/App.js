@@ -7,32 +7,51 @@ import WatchPage from "./components/WatchPage";
 import { Provider } from "react-redux";
 import store from "./utils/store";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-// import Sidebar from "./components/Sidebar";
-// import FixedSidebar from "./components/FixedSidebar";
+import SearchResults from "./components/SearchResults";
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <Body />,
+    exact: true,
+    element: (
+      <div>
+        <Head />
+        <Body />
+      </div>
+    ),
     children: [
       {
         path: "/",
+        exact: true,
         element: <MainContainer />,
       },
     ],
   },
   {
+    path: "/results",
+    exact: true,
+    element: (
+      <div>
+        <Head />
+        <SearchResults />
+      </div>
+    ),
+  },
+  {
     path: "watch",
-    element: <WatchPage />,
+    exact: true,
+    element: (
+      <div>
+        <Head />
+        <WatchPage />
+      </div>
+    ),
   },
 ]);
 function App() {
   return (
     <Provider store={store}>
       <div>
-        <Head />
-        {/* <Sidebar /> */}
-        {/* <FixedSidebar /> */}
         <RouterProvider router={appRouter} />
       </div>
     </Provider>

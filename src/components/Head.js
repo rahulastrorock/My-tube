@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
-import { YOUTUBE_SEARCH_API } from "../utils/constants";
+import { YOUTUBE_SEARCH_API, YOUTUBE_SEARCH_PAGE } from "../utils/constants";
 import { closeMenu } from "../utils/appSlice";
 // import { json } from "react-router-dom";
 import { cacheResult } from "../utils/searchSlice";
+import { setSearchVideos } from "../utils/searchPageSlice";
+import { useNavigate } from "react-router-dom";
 const Head = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [suggestions, setSuggestions] = React.useState([]);
@@ -14,6 +16,8 @@ const Head = () => {
   const cache = searchCache[searchQuery];
 
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     //make an api call after every key press
@@ -47,8 +51,20 @@ const Head = () => {
     dispatch(closeMenu());
   }, [dispatch]);
 
+  //this is for toggling the menu sidebar
   const toggleMenuhandler = () => {
     dispatch(toggleMenu());
+  };
+
+  const handleSearch = async () => {
+    const vidRes = await fetch(YOUTUBE_SEARCH_PAGE + searchQuery);
+    const vidJson = await vidRes.json();
+    console.log(vidJson.items);
+    dispatch(setSearchVideos(vidJson.items));
+    // window.history.push("/results");
+    navigate("/results");
+    // blur the suggestions list
+    setShowSuggestions(false);
   };
 
   return (
@@ -80,7 +96,12 @@ const Head = () => {
               onBlur={() => setShowSuggestions(false)}
               class="w-1/2 p-2 px-5 border border-gray-400 rounded-l-full focus:outline-none focus:border-blue-600 "
             />
-            <button class="border border-gray-400 hover:bg-gray-300 px-5 py-2 rounded-r-full bg-gray-100">
+            <button
+              class="border border-gray-400 hover:bg-gray-300 px-5 py-2 rounded-r-full bg-gray-100"
+              onClick={() => {
+                handleSearch();
+              }}
+            >
               <img
                 className="h-6 mx-2 "
                 alt="searc-icon"
@@ -90,10 +111,18 @@ const Head = () => {
           </div>
           {/* this div is for displaying list of suggestions */}
           {showSuggestions && (
-            <div className="fixed bg-white py-2 px-5 w-[25.5rem] shadow-lg rounded-lg border border-gray-100">
+            <div className="fixed bg-white py-2 px-5 w-[25.5rem] shadow-lg rounded-lg border border-gray-100 ">
               <ul>
                 {suggestions.map((s) => (
-                  <li className="py-1 shadown-sm hover:bg-gray-100">🔍{s}</li>
+                  <li
+                    className="py-1 shadown-sm cursor-pointer hover:bg-blue-100"
+                    //write a function to handle click on suggestion
+                    onClick={() => {
+                      console.log("clicked");
+                    }}
+                  >
+                    🔍{s}
+                  </li>
                 ))}
               </ul>
             </div>
