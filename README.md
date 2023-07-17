@@ -5,4 +5,5 @@
 6. Nested Comments
 7. Live Chats
 8. Autosuggestion feature in search
-9. Caching the search to reduce frequent API Call   
+9. Caching the search to reduce frequent API Call
+10. Debouncing the search api to avoid too much frequent call.
