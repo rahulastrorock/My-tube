@@ -36,7 +36,7 @@ const Head = () => {
   }, [searchQuery]);
 
   async function getSearchSuggestions() {
-    console.log("API call-" + searchQuery);
+    // console.log("API call-" + searchQuery);
     const response = await fetch(YOUTUBE_SEARCH_API + searchQuery);
     const json = await response.json();
     // console.log(json);
@@ -49,24 +49,29 @@ const Head = () => {
   useEffect(() => {
     // this action will keep it close by default
     dispatch(closeMenu());
-  }, [dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //this is for toggling the menu sidebar
-  const toggleMenuhandler = () => {
+  function toggleMenuhandler() {
     dispatch(toggleMenu());
-  };
+  }
 
   const handleSearch = async () => {
     const vidRes = await fetch(YOUTUBE_SEARCH_PAGE + searchQuery);
     const vidJson = await vidRes.json();
-    console.log(vidJson.items);
+    // console.log(vidJson.items);
     dispatch(setSearchVideos(vidJson.items));
     // window.history.push("/results");
     navigate("/results");
     // blur the suggestions list
     setShowSuggestions(false);
   };
-
+  // const handleSuggestionClick = (suggestion) => {
+  //   console.log("clicked Rahul");
+  //   setSearchQuery(suggestion);
+  //   handleSearch();
+  // };
   return (
     <div className="fixed bg-white w-full z-50">
       <div className="grid grid-flow-col p-3 m-2 shadow-lg ">
@@ -113,13 +118,10 @@ const Head = () => {
           {showSuggestions && (
             <div className="fixed bg-white py-2 px-5 w-[25.5rem] shadow-lg rounded-lg border border-gray-100 ">
               <ul>
-                {suggestions.map((s) => (
+                {suggestions?.map((s) => (
                   <li
                     className="py-1 shadown-sm cursor-pointer hover:bg-blue-100"
-                    //write a function to handle click on suggestion
-                    onClick={() => {
-                      console.log("clicked");
-                    }}
+                    // write a function to handle click on suggestion
                   >
                     🔍{s}
                   </li>
